@@ -613,6 +613,9 @@ export default function Admin() {
                     </div>
                     <div style={{ marginBottom: 12 }}>
                       <label style={labelStyle}>Image URL</label>
+                      {editingProduct.image_url && (
+                        <img src={editingProduct.image_url} alt="Product" style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 10, marginBottom: 8, border: '2px solid var(--border)', display: 'block' }} onError={e => (e.currentTarget.style.display = 'none')} />
+                      )}
                       <input value={editingProduct.image_url || ''} onChange={e => setEditingProduct({ ...editingProduct, image_url: e.target.value })} placeholder="https://..." style={inputStyle} />
                     </div>
                     <div style={{ marginBottom: 12 }}>
