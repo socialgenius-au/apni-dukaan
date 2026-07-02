@@ -44,6 +44,19 @@ export default function Admin() {
   const [imageUploading, setImageUploading] = useState(false)
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null)
   const [sortByCategory, setSortByCategory] = useState(false)
+  const [productCategories, setProductCategories] = useState<string[]>([])
+
+  useEffect(() => {
+    axios.get(`${API_URL}/categories`).then(res => setProductCategories(res.data)).catch(() => {})
+  }, [])
+
+  const saveNewCategory = async (name: string) => {
+    if (!name || productCategories.includes(name)) return
+    try {
+      await axios.post(`${API_URL}/categories`, { name })
+      setProductCategories(prev => [...prev, name].sort())
+    } catch {}
+  }
 
   const headers = { 'x-admin-password': password }
 
@@ -758,13 +771,13 @@ export default function Admin() {
                                   try {
                                     await axios.patch(`${API_URL}/products/${p.id}`, { category: val })
                                     setProducts(prev => prev.map((x: any) => x.id === p.id ? { ...x, category: val } : x))
-                                    if (!PRODUCT_CATEGORIES.includes(val)) PRODUCT_CATEGORIES.push(val)
+                                    await saveNewCategory(val)
                                     setProductMsg(`✅ Category updated`)
                                     setTimeout(() => setProductMsg(''), 2000)
                                   } catch { setProductMsg('❌ Failed') }
                                 }} />
                               <datalist id={`catlist-${p.id}`}>
-                                {PRODUCT_CATEGORIES.map(c => <option key={c} value={c} />)}
+                                {productCategories.map(c => <option key={c} value={c} />)}
                               </datalist>
                             </td>
                             <td style={{ padding: '10px 12px' }}>

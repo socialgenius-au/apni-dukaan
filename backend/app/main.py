@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from app.database import engine, Base
-from app.routers import merchants, products, happyhours, orders, payments, auth, promo, admin, tasks, image_upload, staff_bulk, staff_access
+from app.routers import merchants, products, happyhours, orders, payments, auth, promo, admin, tasks, image_upload, staff_bulk, staff_access, categories
 import app.models.models as models
 import os
 load_dotenv()
@@ -28,6 +28,7 @@ app.include_router(tasks.router, prefix="/tasks")
 app.include_router(image_upload.router)
 app.include_router(staff_bulk.router)
 app.include_router(staff_access.router)
+app.include_router(categories.router)
 @app.get("/")
 def root():
     return {"status": "ok", "message": "Hamari Dukaan API is running"}

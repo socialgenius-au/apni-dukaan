@@ -98,3 +98,9 @@ class Article(Base):
     emoji = Column(String, default="📖")
     meta_description = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+class ProductCategory(Base):
+    __tablename__ = "product_categories"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False, unique=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
