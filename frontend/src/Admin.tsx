@@ -477,7 +477,17 @@ export default function Admin() {
                   </div>
                   <div style={{ background: 'white', borderRadius: 16, padding: 20, border: '1px solid var(--border)' }}>
                     <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--green)', marginBottom: 12, textTransform: 'uppercase' }}>Merchant Details</div>
-                    {[['Email', selectedMerchant.email], ['Phone', selectedMerchant.phone], ['ABN', selectedMerchant.abn || 'Not provided'], ['GST', selectedMerchant.gst_registered ? 'Registered' : 'Not registered']].map(([label, value]) => (
+                    <div style={{ marginBottom: 12 }}>
+                      <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-2)', display: 'block', marginBottom: 4 }}>Email</label>
+                      <input value={editData.email || selectedMerchant.email || ''} onChange={e => setEditData({ ...editData, email: e.target.value })}
+                        placeholder="merchant@email.com" style={{ width: '100%', padding: '10px 14px', border: '1px solid var(--border)', borderRadius: 10, fontSize: 14, boxSizing: 'border-box' as const }} />
+                    </div>
+                    <div style={{ marginBottom: 12 }}>
+                      <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-2)', display: 'block', marginBottom: 4 }}>Phone</label>
+                      <input value={editData.phone || selectedMerchant.phone || ''} onChange={e => setEditData({ ...editData, phone: e.target.value })}
+                        placeholder="04xx xxx xxx" style={{ width: '100%', padding: '10px 14px', border: '1px solid var(--border)', borderRadius: 10, fontSize: 14, boxSizing: 'border-box' as const }} />
+                    </div>
+                    {[['ABN', selectedMerchant.abn || 'Not provided'], ['GST', selectedMerchant.gst_registered ? 'Registered' : 'Not registered']].map(([label, value]) => (
                       <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
                         <span style={{ fontSize: 13, color: 'var(--text-2)' }}>{label}</span>
                         <span style={{ fontSize: 13, fontWeight: 600 }}>{value || '-'}</span>
