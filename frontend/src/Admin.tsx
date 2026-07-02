@@ -727,7 +727,24 @@ export default function Admin() {
                               {p.description && <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>{p.description.slice(0, 50)}{p.description.length > 50 ? '...' : ''}</div>}
                             </td>
                             <td style={{ padding: '10px 12px', fontSize: 12, color: 'var(--text-3)' }}>{p.category || '-'}</td>
-                            <td style={{ padding: '10px 12px', fontSize: 14, fontWeight: 700, color: 'var(--green)' }}>${p.price?.toFixed(2)}</td>
+                            <td style={{ padding: '10px 12px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                <span style={{ fontSize: 13 }}>$</span>
+                                <input type="number" step="0.01" defaultValue={p.price?.toFixed(2)}
+                                  id={`price-${p.id}`}
+                                  style={{ width: 70, padding: '4px 6px', border: '1px solid var(--border)', borderRadius: 6, fontSize: 13, fontWeight: 700, color: 'var(--green)' }} />
+                                <button onClick={async () => {
+                                  const val = parseFloat((document.getElementById(`price-${p.id}`) as HTMLInputElement).value)
+                                  if (isNaN(val)) return
+                                  try {
+                                    await axios.patch(`${API_URL}/products/${p.id}`, { price: val })
+                                    setProducts(prev => prev.map(x => x.id === p.id ? { ...x, price: val } : x))
+                                    setProductMsg(`✅ ${p.name} price updated to $${val.toFixed(2)}`)
+                                    setTimeout(() => setProductMsg(''), 3000)
+                                  } catch { setProductMsg('❌ Failed to update price') }
+                                }} style={{ background: 'var(--green)', color: 'white', border: 'none', borderRadius: 6, padding: '4px 8px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>✓</button>
+                              </div>
+                            </td>
                             <td style={{ padding: '10px 12px', fontSize: 13 }}>{p.stock_qty}</td>
                             <td style={{ padding: '10px 12px' }}>
                               <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 6, background: p.is_active ? '#e8f5e9' : '#fce4ec', color: p.is_active ? '#2e7d32' : 'var(--red)' }}>
