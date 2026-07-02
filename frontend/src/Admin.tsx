@@ -41,6 +41,7 @@ export default function Admin() {
   const [importing, setImporting] = useState(false)
   const [importResult, setImportResult] = useState<any>(null)
   const [imageUploading, setImageUploading] = useState(false)
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null)
 
   const headers = { 'x-admin-password': password }
 
@@ -203,6 +204,15 @@ export default function Admin() {
 
   const inputStyle = { width: '100%', padding: '10px 14px', border: '1px solid var(--border)', borderRadius: 10, fontSize: 14, boxSizing: 'border-box' as const }
   const labelStyle = { fontSize: 11, fontWeight: 700, color: 'var(--text-2)', display: 'block', marginBottom: 4 }
+
+  if (lightboxUrl) {
+    return (
+      <div onClick={() => setLightboxUrl(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'zoom-out' }}>
+        <img src={lightboxUrl} alt="Preview" style={{ maxWidth: '90vw', maxHeight: '90vh', objectFit: 'contain', borderRadius: 12, boxShadow: '0 8px 40px rgba(0,0,0,0.6)' }} onClick={e => e.stopPropagation()} />
+        <button onClick={() => setLightboxUrl(null)} style={{ position: 'absolute', top: 20, right: 24, background: 'rgba(255,255,255,0.15)', color: 'white', border: 'none', borderRadius: '50%', width: 40, height: 40, fontSize: 20, cursor: 'pointer', fontWeight: 700 }}>✕</button>
+      </div>
+    )
+  }
 
   if (!loggedIn) {
     return (
@@ -626,7 +636,7 @@ export default function Admin() {
                       <label style={labelStyle}>Product Image</label>
                       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 8 }}>
                         {editingProduct.image_url ? (
-                          <img src={editingProduct.image_url} alt="Product" style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 10, border: '2px solid var(--border)', flexShrink: 0 }} onError={e => (e.currentTarget.style.display = 'none')} />
+                          <img src={editingProduct.image_url} alt="Product" onClick={() => setLightboxUrl(editingProduct.image_url)} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 10, border: '2px solid var(--border)', flexShrink: 0, cursor: 'zoom-in' }} onError={e => (e.currentTarget.style.display = 'none')} />
                         ) : (
                           <div style={{ width: 80, height: 80, borderRadius: 10, border: '2px dashed var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, flexShrink: 0 }}>📷</div>
                         )}
