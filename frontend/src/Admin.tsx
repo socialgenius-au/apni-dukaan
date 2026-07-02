@@ -152,6 +152,7 @@ export default function Admin() {
         category: editingProduct.category,
         emoji: editingProduct.emoji,
         stock_qty: parseInt(editingProduct.stock_qty),
+        image_url: editingProduct.image_url || null,
         is_active: editingProduct.is_active,
       })
       setProducts(prev => prev.map(p => p.id === res.data.id ? res.data : p))
@@ -609,6 +610,10 @@ export default function Admin() {
                         <label style={labelStyle}>Stock Qty</label>
                         <input type="number" value={editingProduct.stock_qty} onChange={e => setEditingProduct({ ...editingProduct, stock_qty: e.target.value })} style={inputStyle} />
                       </div>
+                    </div>
+                    <div style={{ marginBottom: 12 }}>
+                      <label style={labelStyle}>Image URL</label>
+                      <input value={editingProduct.image_url || ''} onChange={e => setEditingProduct({ ...editingProduct, image_url: e.target.value })} placeholder="https://..." style={inputStyle} />
                     </div>
                     <div style={{ marginBottom: 12 }}>
                       <label style={labelStyle}>Description</label>
