@@ -51,6 +51,7 @@ export default function App() {
   const [loading, setLoading] = useState(true)
   const [timers, setTimers] = useState<{ [key: number]: number }>({})
   const [checkoutOpen, setCheckoutOpen] = useState(false)
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null)
   const urlParams = new URLSearchParams(window.location.search)
   const urlPromo = urlParams.get("promo") || ""
   const urlRef = urlParams.get("ref") || ""
@@ -223,7 +224,7 @@ export default function App() {
                 <div className="product-grid" style={{ padding: '0 16px 16px' }}>
                   {filteredGrouped[c].map(p => (
                     <div key={p.id} className="product-card">
-                      <div className="product-img">{p.image_url ? <img src={p.image_url} alt={p.name} style={{width:"100%",height:"100%",objectFit:"cover",borderRadius:"8px"}} /> : <div style={{fontSize:40}}>{p.emoji || "📦"}</div>}</div>
+                      <div className="product-img">{p.image_url ? <img src={p.image_url} alt={p.name} onClick={() => setLightboxUrl(p.image_url || null)} style={{width:"100%",height:"100%",objectFit:"cover",borderRadius:"8px",cursor:'zoom-in'}} /> : <div style={{fontSize:40}}>{p.emoji || "📦"}</div>}</div>
                       <div className="product-info">
                         <div className="product-name">{p.name}</div>
                         <div className="product-price">${p.price.toFixed(2)}</div>
@@ -275,6 +276,12 @@ export default function App() {
           </>
         )}
         <div className={`toast ${toastShow ? 'show' : ''}`}>{toast}</div>
+        {lightboxUrl && (
+          <div onClick={() => setLightboxUrl(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.88)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'zoom-out' }}>
+            <img src={lightboxUrl} alt="Product" style={{ maxWidth: '92vw', maxHeight: '88vh', objectFit: 'contain', borderRadius: 12, boxShadow: '0 8px 40px rgba(0,0,0,0.6)' }} onClick={e => e.stopPropagation()} />
+            <button onClick={() => setLightboxUrl(null)} style={{ position: 'absolute', top: 20, right: 20, background: 'rgba(255,255,255,0.15)', color: 'white', border: 'none', borderRadius: '50%', width: 40, height: 40, fontSize: 20, cursor: 'pointer', fontWeight: 700 }}>✕</button>
+          </div>
+        )}
       </div>
     )
   }
