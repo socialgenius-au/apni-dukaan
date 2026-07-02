@@ -152,11 +152,10 @@ def check_library(name: str):
     except Exception:
         return {"slug": slug, "exists": False, "url": None}
 
-import httpx
-
 @router.get("/proxy-image")
 async def proxy_image(url: str):
     """Proxy R2 images to frontend for canvas editing without CORS issues."""
+    import httpx
     from fastapi.responses import Response
     async with httpx.AsyncClient() as client:
         r = await client.get(url, timeout=15)
