@@ -6,6 +6,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
 const EMOJIS = ['📦','🍚','🫘','🌶️','🧅','🧄','🫚','🍅','🥩','🐟','🍗','🥛','🧀','🥚','🍞','🫓','🧈','🍯','🫖','☕','🧃','🥤','🍵','🌿','🫙','🥫','🍋','🍊','🍌','🍎','🥦','🥕','🌽','🫑','🍆','🥔','🧆','🍢','🍡','🍮','🍰','🎂','🍩','🍪','🍫','🍬','🍭']
 const STORE_EMOJIS = ['🏪','🛒','🏬','🥘','🍱','🛍️','🌏','🍛','🥗','🫕']
 const CATEGORIES = ['Grocery','Restaurant','Butcher','Bakery','Sweets','Pharmacy','General']
+const PRODUCT_CATEGORIES = ['Biscuits & Snacks','Noodles & Instant Food','Rice & Grains','Spices & Condiments','Sauces & Condiments','Tea & Drinks','Fresh Produce','Oils & Ghee','Meat & Protein','Frozen & Dairy','Sweets & Desserts','Bread & Bakery','General']
 
 export default function Admin() {
   const [password, setPassword] = useState('')
@@ -42,6 +43,7 @@ export default function Admin() {
   const [importResult, setImportResult] = useState<any>(null)
   const [imageUploading, setImageUploading] = useState(false)
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null)
+  const [sortByCategory, setSortByCategory] = useState(false)
 
   const headers = { 'x-admin-password': password }
 
@@ -713,20 +715,55 @@ export default function Admin() {
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                       <thead>
                         <tr style={{ background: 'var(--green)', color: 'white' }}>
-                          {['', 'Name', 'Category', 'Price', 'Stock', 'Status', 'Actions'].map(h => (
+                          {['IMG', 'Name', 'Category', 'Price', 'Stock', 'Status', 'Actions'].map(h => (
                             <th key={h} style={{ padding: '10px 12px', textAlign: 'left', fontSize: 12 }}>{h}</th>
                           ))}
+                          <th style={{ padding: '10px 12px' }}>
+                            <button onClick={() => setSortByCategory(s => !s)}
+                              style={{ fontSize: 11, padding: '3px 8px', borderRadius: 6, border: '1px solid rgba(255,255,255,0.3)', background: sortByCategory ? 'rgba(255,255,255,0.2)' : 'transparent', color: 'white', cursor: 'pointer', fontWeight: 700 }}>
+                              {sortByCategory ? '↕ Sorted' : '↕ Sort by Category'}
+                            </button>
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
-                        {products.map((p: any, i: number) => (
+                        {(sortByCategory ? [...products].sort((a: any, b: any) => (a.category || '').localeCompare(b.category || '')) : products).map((p: any, i: number) => (
                           <tr key={p.id} style={{ borderBottom: '1px solid var(--border)', background: i % 2 === 0 ? 'white' : '#fafafa' }}>
-                            <td style={{ padding: '10px 12px', fontSize: 24 }}>{p.emoji}</td>
-                            <td style={{ padding: '10px 12px' }}>
-                              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--green-dark)' }}>{p.name}</div>
-                              {p.description && <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>{p.description.slice(0, 50)}{p.description.length > 50 ? '...' : ''}</div>}
+                            <td style={{ padding: '6px 12px' }}>
+                              {p.image_url
+                                ? <img src={p.image_url} alt={p.name} onClick={() => setLightboxUrl(p.image_url)} style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 6, cursor: 'zoom-in', border: '1px solid var(--border)' }} />
+                                : <span style={{ fontSize: 24 }}>{p.emoji}</span>}
                             </td>
-                            <td style={{ padding: '10px 12px', fontSize: 12, color: 'var(--text-3)' }}>{p.category || '-'}</td>
+                            <td style={{ padding: '6px 12px' }}>
+                              <input defaultValue={p.name} id={`name-${p.id}`}
+                                style={{ width: '100%', padding: '4px 6px', border: '1px solid var(--border)', borderRadius: 6, fontSize: 12, fontWeight: 700, color: 'var(--green-dark)', minWidth: 160 }}
+                                onBlur={async (e) => {
+                                  const val = e.target.value.trim()
+                                  if (!val || val === p.name) return
+                                  try {
+                                    await axios.patch(`${API_URL}/products/${p.id}`, { name: val })
+                                    setProducts(prev => prev.map((x: any) => x.id === p.id ? { ...x, name: val } : x))
+                                    setProductMsg(`✅ Name updated`)
+                                    setTimeout(() => setProductMsg(''), 2000)
+                                  } catch { setProductMsg('❌ Failed') }
+                                }} />
+                            </td>
+                            <td style={{ padding: '6px 12px' }}>
+                              <select defaultValue={p.category || ''} id={`cat-${p.id}`}
+                                style={{ padding: '4px 6px', border: '1px solid var(--border)', borderRadius: 6, fontSize: 11, color: 'var(--text-2)', width: '100%' }}
+                                onChange={async (e) => {
+                                  const val = e.target.value
+                                  try {
+                                    await axios.patch(`${API_URL}/products/${p.id}`, { category: val })
+                                    setProducts(prev => prev.map((x: any) => x.id === p.id ? { ...x, category: val } : x))
+                                    setProductMsg(`✅ Category updated`)
+                                    setTimeout(() => setProductMsg(''), 2000)
+                                  } catch { setProductMsg('❌ Failed') }
+                                }}>
+                                <option value="">-- select --</option>
+                                {PRODUCT_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                              </select>
+                            </td>
                             <td style={{ padding: '10px 12px' }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                                 <span style={{ fontSize: 13 }}>$</span>
@@ -745,7 +782,20 @@ export default function Admin() {
                                 }} style={{ background: 'var(--green)', color: 'white', border: 'none', borderRadius: 6, padding: '4px 8px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>✓</button>
                               </div>
                             </td>
-                            <td style={{ padding: '10px 12px', fontSize: 13 }}>{p.stock_qty}</td>
+                            <td style={{ padding: '6px 12px' }}>
+                              <input type="number" defaultValue={p.stock_qty} id={`stock-${p.id}`}
+                                style={{ width: 60, padding: '4px 6px', border: '1px solid var(--border)', borderRadius: 6, fontSize: 12, textAlign: 'center' }}
+                                onBlur={async (e) => {
+                                  const val = parseInt(e.target.value)
+                                  if (isNaN(val) || val === p.stock_qty) return
+                                  try {
+                                    await axios.patch(`${API_URL}/products/${p.id}`, { stock_qty: val })
+                                    setProducts(prev => prev.map((x: any) => x.id === p.id ? { ...x, stock_qty: val } : x))
+                                    setProductMsg(`✅ Stock updated`)
+                                    setTimeout(() => setProductMsg(''), 2000)
+                                  } catch { setProductMsg('❌ Failed') }
+                                }} />
+                            </td>
                             <td style={{ padding: '10px 12px' }}>
                               <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 6, background: p.is_active ? '#e8f5e9' : '#fce4ec', color: p.is_active ? '#2e7d32' : 'var(--red)' }}>
                                 {p.is_active ? 'Active' : 'Inactive'}
