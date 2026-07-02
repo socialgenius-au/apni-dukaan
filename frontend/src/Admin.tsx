@@ -749,20 +749,23 @@ export default function Admin() {
                                 }} />
                             </td>
                             <td style={{ padding: '6px 12px' }}>
-                              <select defaultValue={p.category || ''} id={`cat-${p.id}`}
+                              <input list={`catlist-${p.id}`} defaultValue={p.category || ''} id={`cat-${p.id}`}
+                                placeholder="Category..."
                                 style={{ padding: '4px 6px', border: '1px solid var(--border)', borderRadius: 6, fontSize: 11, color: 'var(--text-2)', width: '100%' }}
-                                onChange={async (e) => {
-                                  const val = e.target.value
+                                onBlur={async (e) => {
+                                  const val = e.target.value.trim()
+                                  if (!val || val === p.category) return
                                   try {
                                     await axios.patch(`${API_URL}/products/${p.id}`, { category: val })
                                     setProducts(prev => prev.map((x: any) => x.id === p.id ? { ...x, category: val } : x))
+                                    if (!PRODUCT_CATEGORIES.includes(val)) PRODUCT_CATEGORIES.push(val)
                                     setProductMsg(`✅ Category updated`)
                                     setTimeout(() => setProductMsg(''), 2000)
                                   } catch { setProductMsg('❌ Failed') }
-                                }}>
-                                <option value="">-- select --</option>
-                                {PRODUCT_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-                              </select>
+                                }} />
+                              <datalist id={`catlist-${p.id}`}>
+                                {PRODUCT_CATEGORIES.map(c => <option key={c} value={c} />)}
+                              </datalist>
                             </td>
                             <td style={{ padding: '10px 12px' }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
