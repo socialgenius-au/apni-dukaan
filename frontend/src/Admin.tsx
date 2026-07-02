@@ -730,6 +730,17 @@ export default function Admin() {
                                   style={{ background: 'var(--green)', color: 'white', border: 'none', borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
                                   Edit
                                 </button>
+                                <button onClick={async () => {
+                                  try {
+                                    await axios.patch(`${API_URL}/products/${p.id}`, { is_active: !p.is_active })
+                                    setProducts(prev => prev.map(x => x.id === p.id ? { ...x, is_active: !p.is_active } : x))
+                                    setProductMsg(p.is_active ? '🙈 Product hidden' : '✅ Product visible')
+                                    setTimeout(() => setProductMsg(''), 2000)
+                                  } catch { setProductMsg('❌ Failed') }
+                                }}
+                                  style={{ background: p.is_active ? '#fff3e0' : '#e8f5e9', color: p.is_active ? '#e65100' : '#2e7d32', border: 'none', borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                                  {p.is_active ? 'Hide' : 'Show'}
+                                </button>
                                 <button onClick={() => handleDeleteProduct(p.id, p.name)}
                                   style={{ background: '#fce4ec', color: 'var(--red)', border: 'none', borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
                                   Delete
