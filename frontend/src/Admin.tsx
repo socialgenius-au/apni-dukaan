@@ -40,6 +40,7 @@ export default function Admin() {
   const [importFile, setImportFile] = useState<File | null>(null)
   const [importing, setImporting] = useState(false)
   const [importResult, setImportResult] = useState<any>(null)
+  const [imageUploading, setImageUploading] = useState(false)
 
   const headers = { 'x-admin-password': password }
 
@@ -612,11 +613,43 @@ export default function Admin() {
                       </div>
                     </div>
                     <div style={{ marginBottom: 12 }}>
-                      <label style={labelStyle}>Image URL</label>
-                      {editingProduct.image_url && (
-                        <img src={editingProduct.image_url} alt="Product" style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 10, marginBottom: 8, border: '2px solid var(--border)', display: 'block' }} onError={e => (e.currentTarget.style.display = 'none')} />
-                      )}
-                      <input value={editingProduct.image_url || ''} onChange={e => setEditingProduct({ ...editingProduct, image_url: e.target.value })} placeholder="https://..." style={inputStyle} />
+                      <label style={labelStyle}>Product Image</label>
+                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 8 }}>
+                        {editingProduct.image_url ? (
+                          <img src={editingProduct.image_url} alt="Product" style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 10, border: '2px solid var(--border)', flexShrink: 0 }} onError={e => (e.currentTarget.style.display = 'none')} />
+                        ) : (
+                          <div style={{ width: 80, height: 80, borderRadius: 10, border: '2px dashed var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, flexShrink: 0 }}>📷</div>
+                        )}
+                        <div style={{ flex: 1 }}>
+                          <label style={{ display: 'inline-block', background: 'var(--green)', color: 'white', borderRadius: 8, padding: '8px 14px', fontSize: 13, fontWeight: 700, cursor: imageUploading ? 'not-allowed' : 'pointer', opacity: imageUploading ? 0.7 : 1, marginBottom: 8 }}>
+                            {imageUploading ? '⏳ Uploading...' : '📷 Upload New Image'}
+                            <input type="file" accept="image/*" capture="environment" style={{ display: 'none' }} disabled={imageUploading}
+                              onChange={async (e) => {
+                                const file = e.target.files?.[0]
+                                if (!file) return
+                                setImageUploading(true)
+                                setProductMsg('')
+                                try {
+                                  const formData = new FormData()
+                                  formData.append('file', file)
+                                  const res = await axios.post(`${API_URL}/upload/product-image/${editingProduct.id}`, formData, {
+                                    headers: { 'Content-Type': 'multipart/form-data' }
+                                  })
+                                  const newUrl = res.data.image_url || res.data.url || res.data
+                                  setEditingProduct((prev: any) => ({ ...prev, image_url: typeof newUrl === 'string' ? newUrl : prev.image_url }))
+                                  setProducts(prev => prev.map((p: any) => p.id === editingProduct.id ? { ...p, image_url: typeof newUrl === 'string' ? newUrl : p.image_url } : p))
+                                  setProductMsg('✅ Image uploaded!')
+                                  setTimeout(() => setProductMsg(''), 3000)
+                                } catch {
+                                  setProductMsg('❌ Image upload failed')
+                                }
+                                setImageUploading(false)
+                              }} />
+                          </label>
+                          <div style={{ fontSize: 11, color: 'var(--text-3)' }}>Takes photo with camera or choose from gallery</div>
+                        </div>
+                      </div>
+                      <input value={editingProduct.image_url || ''} onChange={e => setEditingProduct({ ...editingProduct, image_url: e.target.value })} placeholder="https://... (or upload above)" style={inputStyle} />
                     </div>
                     <div style={{ marginBottom: 12 }}>
                       <label style={labelStyle}>Description</label>
