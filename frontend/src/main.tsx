@@ -7,10 +7,14 @@ import MerchantAuth from './MerchantAuth.tsx'
 import Dashboard from './Dashboard.tsx'
 import MerchantSettings from "./MerchantSettings.tsx"
 import Admin from "./Admin.tsx"
+import ImageEditor from "./ImageEditor.tsx"
 import BulkEditor from "./BulkEditor.tsx"
 import './index.css'
 
 const path = window.location.pathname
+if (path === '/image-editor') {
+  ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><ImageEditor /></React.StrictMode>)
+} else
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
