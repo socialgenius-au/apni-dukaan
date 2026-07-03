@@ -184,7 +184,7 @@ export default function Admin() {
     setShowAddProduct(false)
     setImportResult(null)
     try {
-      const res = await axios.get(`${API_URL}/products/merchant/${merchant.id}`)
+      const res = await axios.get(`${API_URL}/products/merchant/${merchant.id}/all`)
       setProducts(res.data)
     } catch {
       setProductMsg('Failed to load products')

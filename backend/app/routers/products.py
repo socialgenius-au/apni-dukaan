@@ -56,7 +56,9 @@ def get_products(category: Optional[str] = None, db: Session = Depends(get_db)):
 
 @router.post("/", response_model=ProductOut)
 def create_product(product: ProductCreate, db: Session = Depends(get_db)):
-    db_product = Product(**product.dict())
+    data = product.dict()
+    data['is_active'] = False  # Always hidden until merchant confirms price
+    db_product = Product(**data)
     db.add(db_product)
     db.commit()
     db.refresh(db_product)
@@ -221,6 +223,11 @@ def download_template():
         headers={"Content-Disposition": "attachment; filename=apnidukaan_product_template.csv"}
     )
 
+
+@router.get("/merchant/{merchant_id}/all", response_model=List[ProductOut])
+def get_all_merchant_products(merchant_id: int, db: Session = Depends(get_db)):
+    """Admin endpoint - returns ALL products including hidden ones."""
+    return db.query(Product).filter(Product.merchant_id == merchant_id).order_by(Product.id.desc()).all()
 
 @router.get("/merchant/{merchant_id}", response_model=List[ProductOut])
 def get_merchant_products(merchant_id: int, db: Session = Depends(get_db)):
