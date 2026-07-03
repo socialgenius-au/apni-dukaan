@@ -43,6 +43,7 @@ export default function Admin() {
   const [imageUploading, setImageUploading] = useState(false)
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null)
   const [sortByCategory, setSortByCategory] = useState(false)
+  const [showHiddenOnly, setShowHiddenOnly] = useState(false)
   const [productCategories, setProductCategories] = useState<string[]>([])
 
   useEffect(() => {
@@ -800,11 +801,15 @@ export default function Admin() {
                               style={{ fontSize: 11, padding: '3px 8px', borderRadius: 6, border: '1px solid rgba(255,255,255,0.3)', background: sortByCategory ? 'rgba(255,255,255,0.2)' : 'transparent', color: 'white', cursor: 'pointer', fontWeight: 700 }}>
                               {sortByCategory ? '↕ Sorted' : '↕ Sort by Category'}
                             </button>
+                            <button onClick={() => setShowHiddenOnly(s => !s)}
+                              style={{ fontSize: 11, padding: '3px 8px', borderRadius: 6, border: '1px solid rgba(255,255,255,0.3)', background: showHiddenOnly ? '#ff980022' : 'transparent', color: showHiddenOnly ? '#ffcc80' : 'white', cursor: 'pointer', fontWeight: 700, marginLeft: 6 }}>
+                              {showHiddenOnly ? '👁 Hidden Only' : '👁 All'}
+                            </button>
                           </th>
                         </tr>
                       </thead>
                       <tbody>
-                        {(sortByCategory ? [...products].sort((a: any, b: any) => (a.category || '').localeCompare(b.category || '')) : products).map((p: any, i: number) => (
+                        {(sortByCategory ? [...products].filter((p: any) => !showHiddenOnly || !p.is_active).sort((a: any, b: any) => (a.category || '').localeCompare(b.category || '')) : products.filter((p: any) => !showHiddenOnly || !p.is_active)).map((p: any, i: number) => (
                           <tr key={p.id} style={{ borderBottom: '1px solid var(--border)', background: i % 2 === 0 ? 'white' : '#fafafa' }}>
                             <td style={{ padding: '6px 12px' }}>
                               {p.image_url
