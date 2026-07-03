@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import axios from 'axios'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
@@ -6,7 +6,6 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
 const EMOJIS = ['📦','🍚','🫘','🌶️','🧅','🧄','🫚','🍅','🥩','🐟','🍗','🥛','🧀','🥚','🍞','🫓','🧈','🍯','🫖','☕','🧃','🥤','🍵','🌿','🫙','🥫','🍋','🍊','🍌','🍎','🥦','🥕','🌽','🫑','🍆','🥔','🧆','🍢','🍡','🍮','🍰','🎂','🍩','🍪','🍫','🍬','🍭']
 const STORE_EMOJIS = ['🏪','🛒','🏬','🥘','🍱','🛍️','🌏','🍛','🥗','🫕']
 const CATEGORIES = ['Grocery','Restaurant','Butcher','Bakery','Sweets','Pharmacy','General']
-const PRODUCT_CATEGORIES = ['Biscuits & Snacks','Noodles & Instant Food','Rice & Grains','Spices & Condiments','Sauces & Condiments','Tea & Drinks','Fresh Produce','Oils & Ghee','Meat & Protein','Frozen & Dairy','Sweets & Desserts','Bread & Bakery','General']
 
 export default function Admin() {
   const [password, setPassword] = useState('')
