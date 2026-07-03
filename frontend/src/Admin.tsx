@@ -118,6 +118,63 @@ export default function Admin() {
     setSaving(false)
   }
 
+  const downloadCSV = () => {
+    const headers = ['ID', 'Name', 'Category', 'Price', 'Stock', 'Status', 'Image URL']
+    const rows = products.map((p: any) => [
+      p.id,
+      `"${(p.name || '').replace(/"/g, '""')}"`,
+      `"${(p.category || '').replace(/"/g, '""')}"`,
+      p.price?.toFixed(2) || '0.00',
+      p.stock_qty || 0,
+      p.is_active ? 'Active' : 'Hidden',
+      `"${p.image_url || ''}"`
+    ])
+    const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n')
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${productMerchant?.name || 'products'}-products.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const downloadPDF = () => {
+    const win = window.open('', '_blank')
+    if (!win) return
+    const sorted = sortByCategory ? [...products].sort((a: any, b: any) => (a.category || '').localeCompare(b.category || '')) : products
+    const rows = sorted.map((p: any, i: number) => `
+      <tr style="background:${i%2===0?'#fff':'#f9f9f9'}">
+        <td>${p.id}</td>
+        <td>${p.image_url ? `<img src="${p.image_url}" style="width:40px;height:40px;object-fit:cover;border-radius:4px"/>` : p.emoji || '📦'}</td>
+        <td><strong>${p.name || ''}</strong></td>
+        <td>${p.category || '-'}</td>
+        <td>$${p.price?.toFixed(2) || '0.00'}</td>
+        <td>${p.stock_qty || 0}</td>
+        <td><span style="color:${p.is_active?'green':'red'}">${p.is_active?'Active':'Hidden'}</span></td>
+      </tr>`).join('')
+    win.document.write(`
+      <html><head><title>${productMerchant?.name} — Products</title>
+      <style>
+        body { font-family: Arial, sans-serif; padding: 20px; font-size: 12px; }
+        h2 { color: #276040; } 
+        table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        th { background: #276040; color: white; padding: 8px; text-align: left; }
+        td { padding: 6px 8px; border-bottom: 1px solid #eee; vertical-align: middle; }
+        @media print { button { display: none; } }
+      </style></head>
+      <body>
+        <h2>${productMerchant?.name} — Product List</h2>
+        <p style="color:#888">Generated: ${new Date().toLocaleDateString('en-AU')} · ${products.length} products</p>
+        <button onclick="window.print()" style="background:#276040;color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;margin-bottom:12px">🖨️ Print / Save as PDF</button>
+        <table>
+          <thead><tr><th>ID</th><th>IMG</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </body></html>`)
+    win.document.close()
+  }
+
   const fetchProducts = async (merchant: any) => {
     setProductMerchant(merchant)
     setLoadingProducts(true)
@@ -556,6 +613,14 @@ export default function Admin() {
                   <button onClick={downloadTemplate}
                     style={{ background: 'var(--cream-dark)', color: 'var(--green-dark)', border: '1px solid var(--border)', borderRadius: 10, padding: '10px 18px', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
                     📥 Download CSV Template
+                  </button>
+                  <button onClick={downloadCSV}
+                    style={{ background: '#e8f5e9', color: '#2e7d32', border: '1px solid #a5d6a7', borderRadius: 10, padding: '10px 18px', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+                    📊 Export CSV
+                  </button>
+                  <button onClick={downloadPDF}
+                    style={{ background: '#e3f2fd', color: '#1565c0', border: '1px solid #90caf9', borderRadius: 10, padding: '10px 18px', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+                    📄 Export PDF
                   </button>
                 </div>
 
