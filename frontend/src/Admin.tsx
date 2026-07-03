@@ -809,7 +809,7 @@ export default function Admin() {
                         </tr>
                       </thead>
                       <tbody>
-                        {(sortByCategory ? [...products].filter((p: any) => !showHiddenOnly || !p.is_active).sort((a: any, b: any) => (a.category || '').localeCompare(b.category || '')) : products.filter((p: any) => !showHiddenOnly || !p.is_active)).map((p: any, i: number) => (
+                        {(sortByCategory ? [...products].filter((p: any) => !showHiddenOnly || !p.is_active).sort((a: any, b: any) => (a.category || '').localeCompare(b.category || '')) : products.filter((p: any) => !showHiddenOnly || p.is_active === false)).map((p: any, i: number) => (
                           <tr key={p.id} style={{ borderBottom: '1px solid var(--border)', background: i % 2 === 0 ? 'white' : '#fafafa' }}>
                             <td style={{ padding: '6px 12px' }}>
                               {p.image_url
