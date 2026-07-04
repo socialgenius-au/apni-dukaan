@@ -615,6 +615,25 @@ export default function Admin() {
                     style={{ background: 'var(--cream-dark)', color: 'var(--green-dark)', border: '1px solid var(--border)', borderRadius: 10, padding: '10px 18px', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
                     📥 Download CSV Template
                   </button>
+                  <button onClick={async () => {
+                    const hidden = products.filter((p: any) => !p.is_active)
+                    if (!hidden.length) { setProductMsg('No hidden products to activate'); return }
+                    if (!window.confirm(`Activate all ${hidden.length} hidden products? This makes them live to customers.`)) return
+                    setProductMsg('⏳ Activating...')
+                    let done = 0
+                    for (const p of hidden) {
+                      try {
+                        await axios.patch(`${API_URL}/products/${p.id}`, { is_active: true })
+                        done++
+                      } catch {}
+                    }
+                    setProducts(prev => prev.map((p: any) => ({ ...p, is_active: true })))
+                    setProductMsg(`✅ ${done} products activated!`)
+                    setTimeout(() => setProductMsg(''), 4000)
+                  }}
+                    style={{ background: '#e8f5e9', color: '#2e7d32', border: '1px solid #a5d6a7', borderRadius: 10, padding: '10px 18px', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+                    🚀 Activate All Hidden
+                  </button>
                   <button onClick={downloadCSV}
                     style={{ background: '#e8f5e9', color: '#2e7d32', border: '1px solid #a5d6a7', borderRadius: 10, padding: '10px 18px', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
                     📊 Export CSV
