@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="google-site-verification" content="3r74coSKnt24rPaL5cJP1--ExOP1GjyIjVjWMwTsQ40" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#276040" />
+    <meta name="description" content="Hamari Dukaan — Halal, Fresh, Local. Community marketplace for South Asian and halal groceries in Sydney." />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="HD Merchant" />
+    <link rel="manifest" id="manifest-link" href="/merchant-manifest.json" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <title>Hamari Dukaan — ہماری دکان | Halal · Fresh · Local</title>
+    <script>
+      const isMerchant = window.location.pathname.startsWith('/merchant') || window.location.pathname.startsWith('/dashboard') || window.location.pathname.startsWith('/settings');
+      if (isMerchant) {
+        document.getElementById('manifest-link').setAttribute('href', '/merchant-manifest.json');
+        document.querySelector('meta[name="apple-mobile-web-app-title"]').setAttribute('content', 'HD Merchant');
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('SW registered'))
+            .catch(err => console.log('SW failed:', err))
+        })
+      }
+    </script>
+  </body>
+</html>
