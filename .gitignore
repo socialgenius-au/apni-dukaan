@@ -15,3 +15,8 @@ frontend/dist/
 # System
 .DS_Store
 *.log
+scripts/kingsspice-import/kingsspice_export/
+spare_kings.py
+delete_spare.py
+pipeline2.py
+backend/.env.save
