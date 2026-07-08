@@ -9,9 +9,16 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Hamari Dukaan" />
-    <link rel="manifest" href="/manifest.json" />
+    <link rel="manifest" id="manifest-link" href="/manifest.json" />
     <link rel="apple-touch-icon" href="/icon-192.png" />
-   <title>Hamari Dukaan — ہماری دکان | Halal · Fresh · Local</title>
+    <title>Hamari Dukaan — ہماری دکان | Halal · Fresh · Local</title>
+    <script>
+      const isMerchant = window.location.pathname.startsWith('/merchant') || window.location.pathname.startsWith('/dashboard') || window.location.pathname.startsWith('/settings');
+      if (isMerchant) {
+        document.getElementById('manifest-link').setAttribute('href', '/merchant-manifest.json');
+        document.querySelector('meta[name="apple-mobile-web-app-title"]').setAttribute('content', 'HD Merchant');
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
