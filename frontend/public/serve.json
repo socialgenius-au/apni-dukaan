@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    { "source": "/merchant", "destination": "/merchant.html" },
+    { "source": "/dashboard", "destination": "/merchant.html" },
+    { "source": "/settings", "destination": "/merchant.html" },
+    { "source": "/**", "destination": "/index.html" }
+  ]
+}

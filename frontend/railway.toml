@@ -3,5 +3,5 @@ builder = "NIXPACKS"
 buildCommand = "npm run build"
 
 [deploy]
-startCommand = "npx serve dist -p $PORT --single --rewrite '/merchant=merchant.html' --rewrite '/dashboard=merchant.html' --rewrite '/settings=merchant.html'"
+startCommand = "npx serve dist -p $PORT"
 healthcheckPath = "/"
