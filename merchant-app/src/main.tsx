@@ -9,9 +9,9 @@ const path = window.location.pathname
 
 let Component = MerchantAuth
 
-if (path === '/merchant/dashboard') Component = Dashboard
-else if (path === '/merchant/settings') Component = MerchantSettings
-else if (path === '/merchant' || path === '/merchant/') Component = MerchantAuth
+if (path === '/dashboard') Component = Dashboard
+else if (path === '/settings') Component = MerchantSettings
+else if (path === '/' || path === '') Component = MerchantAuth
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
