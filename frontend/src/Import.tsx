@@ -111,7 +111,7 @@ export default function Import() {
             style={{ width: '100%', padding: '10px 14px', border: '1px solid var(--border)', borderRadius: 10, fontSize: 16, background: 'var(--cream-dark)' }}
           />
           <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 6 }}>
-            Your Merchant ID was provided when your store was set up. Contact Apni Dukaan if you need it.
+            Your Merchant ID was provided when your store was set up. Contact Hamari Dukaan if you need it.
           </div>
         </div>
 

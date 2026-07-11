@@ -274,7 +274,7 @@ export default function Checkout({ cart, merchantId, onClose, promoCode = '', re
         </button>
 
         <div style={{ textAlign: 'center', marginTop: 12, fontSize: 11, color: 'var(--text-3)' }}>
-          🔒 Secured by Stripe · Card details never stored on Apni Dukaan
+          🔒 Secured by Stripe · Card details never stored on Hamari Dukaan
         </div>
       </div>
     )

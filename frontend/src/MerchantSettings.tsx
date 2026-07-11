@@ -157,7 +157,7 @@ export default function MerchantSettings() {
           <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--green)', marginBottom: 12, textTransform: 'uppercase' }}>Login Details</div>
           <div style={{ fontSize: 13, color: 'var(--text-2)', marginBottom: 4 }}>Email address</div>
           <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--green-dark)', marginBottom: 8 }}>{email}</div>
-          <div style={{ fontSize: 12, color: 'var(--text-3)' }}>To change your password contact Apni Dukaan support</div>
+          <div style={{ fontSize: 12, color: 'var(--text-3)' }}>To change your password contact Hamari Dukaan support</div>
         </div>
 
         {error && (

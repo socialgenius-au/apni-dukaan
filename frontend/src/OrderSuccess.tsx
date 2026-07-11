@@ -70,7 +70,7 @@ export default function OrderSuccess() {
       </div>
 
       <button className="btn-primary" onClick={goHome}>
-        ← Back to Apni Dukaan
+        ← Back to Hamari Dukaan
       </button>
     </div>
   )

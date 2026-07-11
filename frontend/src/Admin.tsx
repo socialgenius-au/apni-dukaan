@@ -291,7 +291,7 @@ export default function Admin() {
       <div style={{ minHeight: '100vh', background: 'var(--cream)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
         <div style={{ width: '100%', maxWidth: 400 }}>
           <div style={{ background: 'var(--green-dark)', borderRadius: 16, padding: '24px', textAlign: 'center', marginBottom: 20 }}>
-            <div style={{ fontSize: 24, fontWeight: 700, color: 'white' }}>Apni Dukaan</div>
+            <div style={{ fontSize: 24, fontWeight: 700, color: 'white' }}>Hamari Dukaan</div>
             <div style={{ fontSize: 14, color: 'var(--gold)', marginTop: 4 }}>Admin Panel</div>
           </div>
           <div style={{ background: 'white', borderRadius: 16, padding: 20, border: '1px solid var(--border)' }}>
@@ -315,7 +315,7 @@ export default function Admin() {
       {/* Header */}
       <div style={{ background: 'var(--green-dark)', padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          <div style={{ fontSize: 18, fontWeight: 700, color: 'white' }}>Apni Dukaan — Admin</div>
+          <div style={{ fontSize: 18, fontWeight: 700, color: 'white' }}>Hamari Dukaan — Admin</div>
           <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>Platform command centre</div>
         </div>
         <button onClick={() => setLoggedIn(false)}

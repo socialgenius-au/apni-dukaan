@@ -4,8 +4,8 @@ from datetime import datetime
 import os
 
 SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
-FROM_EMAIL = "orders@apnidukaan.au"
-FROM_NAME = "Apni Dukaan"
+FROM_EMAIL = "orders@hamaridukaan.au"
+FROM_NAME = "Hamari Dukaan"
 
 def get_greeting():
     hour = datetime.utcnow().hour + 10  # AEST offset
@@ -29,12 +29,12 @@ def send_buyer_confirmation(buyer_email: str, buyer_name: str, order_id: int, to
         message = Mail(
             from_email=(FROM_EMAIL, FROM_NAME),
             to_emails=buyer_email,
-            subject=f"Order Confirmed #{order_id} — Apni Dukaan",
+            subject=f"Order Confirmed #{order_id} — Hamari Dukaan",
             html_content=f"""
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                 <div style="background: #276040; padding: 20px; text-align: center;">
-                    <h1 style="color: white; margin: 0; font-size: 28px;">Apni Dukaan</h1>
-                    <p style="color: #E8B84B; margin: 4px 0; font-size: 16px;">اپنی دکان</p>
+                    <h1 style="color: white; margin: 0; font-size: 28px;">Hamari Dukaan</h1>
+                    <p style="color: #E8B84B; margin: 4px 0; font-size: 16px;">ہماری دکان</p>
                     <p style="color: rgba(255,255,255,0.8); margin: 8px 0 0; font-size: 13px;">Halal · Fresh · Local</p>
                 </div>
                 <div style="padding: 28px 24px;">
@@ -59,7 +59,7 @@ def send_buyer_confirmation(buyer_email: str, buyer_name: str, order_id: int, to
                     <p style="color: #9a9a8a; font-size: 13px; line-height: 1.6;">If you have any questions about your order, please contact the merchant directly on {merchant_phone} or reply to this email.</p>
                 </div>
                 <div style="background: #1a4a30; padding: 16px; text-align: center;">
-                    <p style="color: rgba(255,255,255,0.5); font-size: 12px; margin: 0;">Apni Dukaan · apnidukaan.au</p>
+                    <p style="color: rgba(255,255,255,0.5); font-size: 12px; margin: 0;">Hamari Dukaan · hamaridukaan.au</p>
                     <p style="color: rgba(255,255,255,0.4); font-size: 11px; margin: 4px 0 0;">Auburn · Pendle Hill · Lakemba · Merrylands</p>
                 </div>
             </div>
@@ -78,12 +78,12 @@ def send_merchant_notification(merchant_email: str, merchant_name: str, order_id
         message = Mail(
             from_email=(FROM_EMAIL, FROM_NAME),
             to_emails=merchant_email,
-            subject=f"New Order #{order_id} from {buyer_name} — Apni Dukaan",
+            subject=f"New Order #{order_id} from {buyer_name} — Hamari Dukaan",
             html_content=f"""
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                 <div style="background: #276040; padding: 20px; text-align: center;">
                     <h1 style="color: white; margin: 0; font-size: 28px;">New Order! 🎉</h1>
-                    <p style="color: #E8B84B; margin: 8px 0 0; font-size: 14px;">Apni Dukaan — Merchant Notification</p>
+                    <p style="color: #E8B84B; margin: 8px 0 0; font-size: 14px;">Hamari Dukaan — Merchant Notification</p>
                 </div>
                 <div style="padding: 28px 24px;">
                     <h2 style="color: #276040; margin-bottom: 4px;">You have a new order</h2>
@@ -110,13 +110,13 @@ def send_merchant_notification(merchant_email: str, merchant_name: str, order_id
                     </div>
 
                     <div style="text-align: center; margin: 24px 0;">
-                        <a href="https://apnidukaan.au/dashboard" style="display: inline-block; background: #E8B84B; color: #1a4a30; padding: 14px 32px; border-radius: 10px; text-decoration: none; font-weight: bold; font-size: 15px;">View Order in Dashboard →</a>
+                        <a href="https://hamaridukaan.au/dashboard" style="display: inline-block; background: #E8B84B; color: #1a4a30; padding: 14px 32px; border-radius: 10px; text-decoration: none; font-weight: bold; font-size: 15px;">View Order in Dashboard →</a>
                     </div>
 
-                    <p style="color: #9a9a8a; font-size: 13px; line-height: 1.6;">Your payout will be processed to your registered bank account. If you have any questions, contact Apni Dukaan support.</p>
+                    <p style="color: #9a9a8a; font-size: 13px; line-height: 1.6;">Your payout will be processed to your registered bank account. If you have any questions, contact Hamari Dukaan support.</p>
                 </div>
                 <div style="background: #1a4a30; padding: 16px; text-align: center;">
-                    <p style="color: rgba(255,255,255,0.5); font-size: 12px; margin: 0;">Apni Dukaan · apnidukaan.au</p>
+                    <p style="color: rgba(255,255,255,0.5); font-size: 12px; margin: 0;">Hamari Dukaan · hamaridukaan.au</p>
                     <p style="color: rgba(255,255,255,0.4); font-size: 11px; margin: 4px 0 0;">Auburn · Pendle Hill · Lakemba · Merrylands</p>
                 </div>
             </div>
