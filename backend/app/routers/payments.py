@@ -282,14 +282,14 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
 
     if event["type"] == "checkout.session.completed":
         session = event["data"]["object"]
-        metadata = session.get("metadata", {})
-        merchant_id = int(metadata.get("merchant_id", 0))
+        metadata = session["metadata"]
+        merchant_id = int(metadata["merchant_id"])
         buyer_name = metadata.get("buyer_name", "")
         buyer_phone = metadata.get("buyer_phone", "")
-        buyer_email = session.get("customer_email", "")
-        total = session.get("amount_total", 0) / 100
+        buyer_email = session["customer_email"] or ""
+        total = session["amount_total"] / 100
         subtotal = float(metadata.get("subtotal", total))
-        promo_code = metadata.get("promo_code", "") or None
+        promo_code = metadata.get("promo_code") or None
         promo_discount = float(metadata.get("promo_discount", 0))
         gst_amount = float(metadata.get("gst_amount", 0))
         surcharge = float(metadata.get("surcharge", 0))
@@ -297,7 +297,7 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
         commission = float(metadata.get("commission", 0))
         merchant_payout = float(metadata.get("merchant_payout", 0))
         payment_method = metadata.get("payment_method", "card")
-        ref_code = metadata.get("ref_code", "") or None
+        ref_code = metadata.get("ref_code") or None
 
         order = Order(
             merchant_id=merchant_id,
@@ -317,7 +317,7 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
             promo_discount=promo_discount,
             ref_code=ref_code,
             status="paid",
-            stripe_session_id=session.get("id")
+            stripe_session_id=session["id"]
         )
         db.add(order)
         db.commit()
