@@ -271,6 +271,7 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
     payload = await request.body()
     sig_header = request.headers.get("stripe-signature")
     webhook_secret = os.getenv("STRIPE_WEBHOOK_SECRET", "")
+    
     try:
         if webhook_secret:
             event = stripe.Webhook.construct_event(payload, sig_header, webhook_secret)
@@ -281,13 +282,16 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail=str(e))
 
     if event["type"] == "checkout.session.completed":
-        session = event["data"]["object"]
-        metadata = dict(session["metadata"])
-        merchant_id = int(metadata["merchant_id"])
+        import json
+        # Parse raw JSON to avoid Stripe object issues
+        raw = json.loads(payload)
+        session = raw["data"]["object"]
+        metadata = session.get("metadata", {})
+        merchant_id = int(metadata.get("merchant_id", 0))
         buyer_name = metadata.get("buyer_name", "")
         buyer_phone = metadata.get("buyer_phone", "")
-        buyer_email = session["customer_email"] or ""
-        total = session["amount_total"] / 100
+        buyer_email = session.get("customer_email", "") or ""
+        total = session.get("amount_total", 0) / 100
         subtotal = float(metadata.get("subtotal", total))
         promo_code = metadata.get("promo_code") or None
         promo_discount = float(metadata.get("promo_discount", 0))
@@ -317,7 +321,7 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
             promo_discount=promo_discount,
             ref_code=ref_code,
             status="paid",
-            stripe_session_id=session["id"]
+            stripe_session_id=session.get("id")
         )
         db.add(order)
         db.commit()
