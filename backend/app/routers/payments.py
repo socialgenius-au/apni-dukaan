@@ -282,7 +282,7 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
 
     if event["type"] == "checkout.session.completed":
         session = event["data"]["object"]
-        metadata = session["metadata"]
+        metadata = dict(session["metadata"])
         merchant_id = int(metadata["merchant_id"])
         buyer_name = metadata.get("buyer_name", "")
         buyer_phone = metadata.get("buyer_phone", "")
