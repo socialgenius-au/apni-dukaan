@@ -311,6 +311,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<TabType>('orders')
   const [updatingId, setUpdatingId] = useState<number | null>(null)
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [tasks, setTasks] = useState<ProductTask[]>([])
   const [taskSummary, setTaskSummary] = useState<TaskSummary | null>(null)
   const [tasksLoading, setTasksLoading] = useState(false)
@@ -637,13 +638,36 @@ export default function Dashboard() {
                       </div>
                       <span style={{ fontSize: 10, fontWeight: 700, background: s.bg, color: s.color, padding: '3px 8px', borderRadius: 6 }}>{s.label}</span>
                     </div>
+
+                    {/* Status Progress Bar */}
+                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12 }}>
+                      {[{key:'paid',label:'Confirmed'},{key:'ready',label:'Ready'},{key:'fulfilled',label:'Delivered'}].map((stage, i) => {
+                        const stages = ['paid','ready','fulfilled']
+                        const ci = stages.indexOf(order.status)
+                        const done = i <= ci
+                        return (
+                          <div key={stage.key} style={{ display: 'flex', alignItems: 'center', flex: i < 2 ? 1 : 'none' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                              <div style={{ width: 24, height: 24, borderRadius: '50%', background: done ? 'var(--green)' : '#e0e0e0', color: 'white', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{done ? '✓' : i+1}</div>
+                              <div style={{ fontSize: 9, color: done ? 'var(--green)' : '#aaa', fontWeight: done ? 700 : 400, marginTop: 2, whiteSpace: 'nowrap' }}>{stage.label}</div>
+                            </div>
+                            {i < 2 && <div style={{ flex: 1, height: 2, background: i < ci ? 'var(--green)' : '#e0e0e0', margin: '0 4px', marginBottom: 12 }} />}
+                          </div>
+                        )
+                      })}
+                    </div>
+
+                    {/* Order Items */}
                     <div style={{ background: 'var(--cream-dark)', borderRadius: 10, padding: '10px 12px', marginBottom: 10 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                        <span style={{ fontSize: 12, color: 'var(--text-2)' }}>Order total</span>
-                        <span style={{ fontSize: 12, fontWeight: 600 }}>${order.total?.toFixed(2)}</span>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                        <span style={{ fontSize: 12, color: 'var(--text-2)' }}>Commission</span>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--green)', marginBottom: 8, textTransform: 'uppercase' }}>Order Items</div>
+                      {(order.items || []).map((item: any, idx: number) => (
+                        <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                          <span style={{ fontSize: 12, color: 'var(--text-2)' }}>{item.emoji} {item.name} x{item.qty}</span>
+                          <span style={{ fontSize: 12, fontWeight: 600 }}>${(item.price * item.qty).toFixed(2)}</span>
+                        </div>
+                      ))}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, borderTop: '1px solid var(--border)', paddingTop: 6, marginTop: 4 }}>
+                        <span style={{ fontSize: 12, color: 'var(--text-2)' }}>Commission (10%)</span>
                         <span style={{ fontSize: 12, color: 'var(--red)' }}>-${order.commission?.toFixed(2)}</span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--border)', paddingTop: 6, marginTop: 4 }}>
@@ -651,9 +675,11 @@ export default function Dashboard() {
                         <span style={{ fontSize: 14, fontWeight: 700, color: '#2e7d32' }}>${order.merchant_payout?.toFixed(2)}</span>
                       </div>
                     </div>
+
                     <div style={{ display: 'flex', gap: 8 }}>
                       {order.status === 'paid' && <button onClick={() => updateStatus(order.id, 'ready')} disabled={updatingId === order.id} style={{ flex: 1, padding: '10px', background: 'var(--green)', color: 'white', border: 'none', borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>{updatingId === order.id ? '⏳' : '✓ Mark Ready'}</button>}
                       {order.status === 'ready' && <button onClick={() => updateStatus(order.id, 'fulfilled')} disabled={updatingId === order.id} style={{ flex: 1, padding: '10px', background: '#2e7d32', color: 'white', border: 'none', borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>{updatingId === order.id ? '⏳' : '✓ Mark Collected'}</button>}
+                      {order.status === 'fulfilled' && <div style={{ flex: 1, padding: '10px', background: '#e8f5e9', borderRadius: 10, fontSize: 13, fontWeight: 700, color: '#2e7d32', textAlign: 'center' }}>✅ Completed</div>}
                       {order.buyer_phone && <a href={`tel:${order.buyer_phone}`} style={{ padding: '10px 14px', background: 'var(--cream-dark)', border: '1px solid var(--border)', borderRadius: 10, fontSize: 13, color: 'var(--green-dark)', fontWeight: 600, textDecoration: 'none' }}>📞</a>}
                     </div>
                   </div>
