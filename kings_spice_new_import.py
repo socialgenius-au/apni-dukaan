@@ -92,7 +92,9 @@ PRODUCT_DELAY_RANGE_SECONDS = (0.5, 1.5)
 # ---------------------------------------------------------------------------
 CATEGORY_RULES = [
     ("MT", ["chicken", "mutton", "goat", "beef", "fish", "prawn", "seafood", "meat",
-            "kofta", "nihari", "murgh", "keema", "seekh"]),
+            "kofta", "nihari", "murgh", "keema", "seekh",
+            "mackerel", "sardine", "tuna", "salmon", "anchovy", "herring", "pilchard",
+            "crab", "squid", "cuttlefish", "shrimp"]),
     ("FZ", ["frozen", "samosa", "spring roll", "paratha", "roti", "naan", "momo", "kulfi",
             "ice cream", "cornetto", "magnum", "fish finger", "nugget", "keep frozen",
             "porotta", "parotta", "appam", "idiyappam", "chappati", "chapati", "puffs", "banana crisps",
@@ -100,6 +102,7 @@ CATEGORY_RULES = [
             "cutlet"]),
     ("DY", ["ghee", "milk", "cheese", "butter", "curd", "yogurt", "yoghurt", "paneer",
             "cream", "margarine", "dahi", "dairy whitener"]),
+    ("OL", ["oil", "vanaspati"]),
     ("RD", ["ready to eat", "minute khana", "heat & eat", "heat and eat", "curry mix",
             "biryani mix", "complete mix", "instant mix", "idly,chutney", "idli, chutney",
             "idli mix", "idli batter", "idly batter", "dosa mix", "dosa batter",
@@ -128,33 +131,32 @@ CATEGORY_RULES = [
     ("BV", ["tea", "coffee", "juice", "drink", "sprite", "soda", "syrup", "sharbet",
             "squash", "cordial", "nectar", "energy drink", "malt", "faluda", "milo",
             "horlicks", "vinegar"]),
-    ("OL", ["oil", "vanaspati"]),
     ("AT", ["atta", "flour", "maida", "besan", "semolina", "rava", "podi", "sattu",
             "almond meal", "gram flour", "gelatine", "gelatin"]),
+    ("HB", ["soap", "shampoo", "toothpaste", "toothbrush", "hair colour", "hair color",
+            "color naturals", "henna", "mehandi", "mehendi", "balm", "face wash",
+            "cosmetic", "sandal", "cream & honey", "deodorant", "antiperspirant",
+            "hand wash", "bleach", "wax strips", "cold wax", "face pack", "face scrub",
+            "toner", "lotion", "hair dye", "hair gel", "body spray", "fragrance",
+            "multani mitti", "talcum", "reetha", "aritha"]),
+    ("HH", ["detergent", "washing", "laundry", "dishwashing", "dishwasher", "toilet paper",
+            "mothball", "cleaning", "matches", "candle", "mosquito coil", "mosquito",
+            "dengue", "spray cleaner", "disinfectant", "fabric conditioner",
+            "garbage bag", "kitchen tidy", "bin bag", "wipes", "dishwash", "cockroach",
+            "insect killer", "air freshener", "paper towel", "paper plate", "padlock"]),
     ("RC", ["agarbathi", "agarbatti", "incense", "camphor", "kumkum", "sindoor", "pooja",
             "puja", "dhoop", "joss stick", "rangoli", "sandalwood", "sandal wood",
             "havan", "diya"]),
     ("PL", ["dal", "dhal", "lentil", "chana", "gram", "chickpea", "beans", "pulse",
             "moong", "urad", "urid", "toor", "split peas", "soya", "soy protein",
             "soy textured"]),
-    ("SP", ["masala", "spice", "powder", "chilli", "chili", "cumin", "coriander",
+    ("SP", ["masala", "spice", "curry powder", "chilli", "chili", "chilly", "cumin", "coriander",
             "cardamom", "cinnamon", "salt", "pepper", "seasoning", "ajwain", "turmeric",
             "mustard", "fennel", "clove", "asafoetida", "hing", "goraka", "kudampuli",
             "cambodge", "gamboge", "tamarind", "star anise", "anise", "bay leaf",
             "bay leaves", "mace", "jathipathri", "rose water", "kewra water", "vanilla",
             "food colour", "food color", "flavour", "flavouring", "amchur", "anardana",
             "pomegranate seed", "garlic paste", "ginger paste"]),
-    ("HB", ["soap", "shampoo", "toothpaste", "toothbrush", "hair colour", "hair color",
-            "color naturals", "henna", "mehandi", "mehendi", "balm", "face wash",
-            "cosmetic", "sandal", "cream & honey", "deodorant", "antiperspirant",
-            "hand wash", "bleach", "wax strips", "cold wax", "face pack", "face scrub",
-            "toner", "lotion", "hair dye", "hair gel", "body spray", "fragrance",
-            "multani mitti"]),
-    ("HH", ["detergent", "washing", "toilet paper", "mothball", "cleaning", "matches",
-            "candle", "mosquito coil", "mosquito", "dengue", "spray cleaner",
-            "disinfectant", "fabric conditioner", "garbage bag", "kitchen tidy",
-            "bin bag", "wipes", "dishwash", "cockroach", "insect killer",
-            "air freshener", "paper towel", "paper plate", "padlock"]),
     ("KW", ["kitchenware", "cookware", "utensil", "steel plate", "steel bowl", "spoon",
             "container", "frying pan", "paniyaram pan", "cake pan", "saucepan",
             "sauce pan", "roasting pan", "tawa", "vessel", "pot", "cooker", "kadai",
@@ -176,8 +178,51 @@ CATEGORY_NAMES = {
 }
 
 
+# Trailing nouns that mean "masala" is a FLAVOR of a snack product rather
+# than the product itself being a spice/seasoning blend (e.g. "Masala
+# Chips" is a snack, not a spice mix -- but "Chicken Masala" or "Pani Puri
+# Masala" IS the spice mix, even though "chicken"/"pani puri" would
+# otherwise match MT/SN first).
+_SPICE_BLEND_NON_SPICE_TRAILING_NOUNS = {
+    "chips", "chip", "peanuts", "peanut", "boondi", "mixture", "sev",
+    "fryums", "fryum", "puri", "papad", "nuts", "cashew", "cashews",
+    "wafers", "wafer", "crackers", "cracker", "namkeen",
+}
+
+
+_SPICE_BLEND_UNIT_SUFFIX_RE = re.compile(
+    r"\d+[\d.]*\s*(kg|gm|gms|grams|g|ml|l|litres?|liters?|pcs|pack|oz|lbs|lb)\b"
+)
+
+
+def _is_spice_blend_name(text: str) -> bool:
+    t = text.lower().replace("_", " ")
+    if re.search(r"\bpan masala\b", t):
+        return False  # a betel-nut mouth freshener, not a cooking spice blend
+    if re.search(r"\bseasoning\b", t) or re.search(r"\bspice powder\b", t) or re.search(r"\bmasala powder\b", t):
+        return True
+    if "masala" not in t:
+        return False
+    # Strip parenthetical notes and trailing size/weight/pack annotations so
+    # we can look at the actual last word of the product name -- weight
+    # suffixes glued directly onto the number with no separating dash
+    # ("...MASALA MIXTURE 400G") must be stripped as a unit, otherwise a
+    # stray leftover unit letter ends up as the "last word" instead of the
+    # real trailing noun.
+    core = re.sub(r"[\(\[].*?[\)\]]", " ", t)
+    core = re.sub(r"[–—-]\s*\d.*$", " ", core)
+    core = _SPICE_BLEND_UNIT_SUFFIX_RE.sub(" ", core)
+    core = re.sub(r"[^a-z\s]", " ", core)
+    words = [w for w in core.split() if w]
+    if not words:
+        return False
+    return words[-1] not in _SPICE_BLEND_NON_SPICE_TRAILING_NOUNS
+
+
 def categorize(text: str) -> str:
     t = text.lower().replace("_", " ").replace("-", " ")
+    if _is_spice_blend_name(text):
+        return "SP"
     for code, keywords in CATEGORY_RULES:
         if any(re.search(rf"\b{re.escape(kw)}s?\b", t) for kw in keywords):
             return code
