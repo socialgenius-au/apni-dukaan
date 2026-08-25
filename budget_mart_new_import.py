@@ -1,11 +1,12 @@
 """
-Budget Mart (merchant_id=4) — import NEW product images from Drive.
+Budget Mart (merchant_id=4) — import NEW product images from
+budget_mart_new_images/.
 
 Run from Claude Code in the Codespace:
     pip install pillow boto3 requests --break-system-packages
     python3 budget_mart_new_import.py
 
-Env vars needed (.env): GOOGLE_API_KEY, R2_ENDPOINT, R2_ACCESS_KEY_ID,
+Env vars needed (.env): R2_ENDPOINT, R2_ACCESS_KEY_ID,
 R2_SECRET_ACCESS_KEY, R2_BUCKET, R2_PUBLIC_URL
 
 What it does:
@@ -13,8 +14,7 @@ What it does:
      find the current max sequence number per category, so new codes
      continue the sequence rather than colliding with the 253 already
      backfilled.
-  2. Lists + downloads every image in the new Drive folder via the Drive
-     API v3 with an API key (no rate limit, unlike anonymous gdown).
+  2. Reads every image already in budget_mart_new_images/.
   3. Dedups BEFORE anything touches the database or R2:
        - exact duplicates: same file content hash -> keep first
        - near-duplicates: same normalized product name -> keep the
@@ -30,7 +30,6 @@ Safe to re-run: logs progress in budget_mart_new_processed.json.
 import os
 import re
 import json
-import time
 import hashlib
 import requests
 from pathlib import Path
@@ -42,20 +41,16 @@ from botocore.config import Config
 # ---------------------------------------------------------------------------
 MERCHANT_ID = 4
 MERCHANT_CODE = "BM"
-DRIVE_FOLDER_ID = "1X9pJdoWOaMK5s96mAhHCp2j4bldZfRMs"
 DOWNLOAD_DIR = Path("budget_mart_new_images")
 LOG_FILE = Path("budget_mart_new_processed.json")
 
 API_URL = os.environ.get("API_URL", "https://hamari-dukaan-production.up.railway.app")
-GOOGLE_API_KEY = os.environ["GOOGLE_API_KEY"]
 
 R2_ENDPOINT = os.environ["R2_ENDPOINT"]
 R2_KEY_ID = os.environ["R2_ACCESS_KEY_ID"]
 R2_SECRET = os.environ["R2_SECRET_ACCESS_KEY"]
 R2_BUCKET = os.environ["R2_BUCKET"]
 R2_PUBLIC_URL = os.environ["R2_PUBLIC_URL"]
-
-DRIVE_LIST_URL = "https://www.googleapis.com/drive/v3/files"
 
 # ---------------------------------------------------------------------------
 # EXACT SAME rules as backfill_budget_mart_codes.py — keep these two files
@@ -171,45 +166,6 @@ def save_log(log):
     LOG_FILE.write_text(json.dumps(log, indent=2))
 
 
-def list_drive_files():
-    files = []
-    page_token = None
-    while True:
-        params = {
-            "q": f"'{DRIVE_FOLDER_ID}' in parents and trashed = false",
-            "key": GOOGLE_API_KEY,
-            "fields": "nextPageToken, files(id, name, mimeType, size)",
-            "pageSize": 1000,
-        }
-        if page_token:
-            params["pageToken"] = page_token
-        resp = requests.get(DRIVE_LIST_URL, params=params, timeout=30)
-        resp.raise_for_status()
-        data = resp.json()
-        files.extend(data.get("files", []))
-        page_token = data.get("nextPageToken")
-        if not page_token:
-            break
-    return files
-
-
-def download_drive_file(file_id: str, max_retries: int = 4) -> bytes:
-    """Drive's alt=media endpoint throttles bursts of requests with a generic
-    'automated queries' abuse page (still HTTP 403) rather than a normal rate-
-    limit error. Retry with exponential backoff before giving up."""
-    url = f"{DRIVE_LIST_URL}/{file_id}"
-    delay = 2
-    for attempt in range(1, max_retries + 1):
-        resp = requests.get(url, params={"alt": "media", "key": GOOGLE_API_KEY}, timeout=60)
-        if resp.status_code == 200:
-            return resp.content
-        if attempt == max_retries:
-            resp.raise_for_status()
-        time.sleep(delay)
-        delay *= 2
-    raise RuntimeError("unreachable")
-
-
 def dedup(local_files):
     seen_hashes = {}
     seen_names = {}
@@ -239,25 +195,6 @@ def main():
     print("Checking existing Budget Mart barcodes to continue numbering...")
     counters = get_existing_counters()
     print(f"Current max per category: {counters}")
-
-    DOWNLOAD_DIR.mkdir(exist_ok=True)
-    print("Listing files in Drive folder...")
-    drive_files = list_drive_files()
-    print(f"Found {len(drive_files)} files in Drive.")
-
-    print("Downloading any not already on disk...")
-    for i, f in enumerate(drive_files):
-        local_path = DOWNLOAD_DIR / f["name"]
-        if local_path.exists():
-            continue
-        try:
-            content = download_drive_file(f["id"])
-            local_path.write_bytes(content)
-        except Exception as e:
-            print(f"  FAILED download {f['name']}: {e}")
-        time.sleep(0.5)
-        if (i + 1) % 50 == 0:
-            print(f"  ...{i+1}/{len(drive_files)}")
 
     all_local = sorted([p for p in DOWNLOAD_DIR.iterdir() if p.is_file()])
     print(f"{len(all_local)} files on disk. Running dedup...")
